@@ -18,25 +18,20 @@ public class GreenCutsUtils
     public static boolean tryPlanting(Block block, ServerWorld world, BlockPos pos)
     {
         BlockState state = block.getDefaultState();
-
-        int randInt = 0;
+        int randInt = world.random.nextInt(101);
         int plantChance = GreenCuts.getConfig().getAutoPlantChance();
-        if(plantChance < 100)
-        {
-            randInt = world.random.nextInt(101);
-        }
-        else
+        if(plantChance >= 100)
         {
             return true;
         }
 
-        if(randInt < plantChance)
+        if(randInt >= plantChance)
         {
-            world.setBlockState(pos, state);
-            return true;
+            return false;
         }
 
-        return false;
+        world.setBlockState(pos, state);
+        return true;
     }
 }
 
