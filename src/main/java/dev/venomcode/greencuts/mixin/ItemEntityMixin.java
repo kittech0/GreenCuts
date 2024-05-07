@@ -29,32 +29,27 @@ public abstract class ItemEntityMixin extends Entity implements AutoPlantable
     @Inject( method = "tick", at = @At("HEAD"))
     void onTick(CallbackInfo ci)
     {
-        if(!getWorld().isClient && GreenCuts.getConfig().getEnabled() && !triedPlanting())
+        if(!(!getWorld().isClient && GreenCuts.getConfig().getEnabled() && !triedPlanting())) return;
+        if(!GreenCutsUtils.isSaplingStack(this.getStack())) return;
+        if(this.itemAge < GreenCuts.getConfig().getAutoPlantTicks()) return;
+        
+        ServerWorld srvWorld = (ServerWorld) getWorld();
+        BlockState state = Block.getBlockFromItem(this.getStack().getItem()).getDefaultState();
+        
+        if(!(state.getBlock().canPlaceAt(state, getWorld(), getBlockPos()) && getWorld().getBlockState(getBlockPos()).isAir())) return;
+        
+        setTriedPlanting(true);
+        
+        if (GreenCutsUtils.tryPlanting(state.getBlock(), srvWorld, this.getBlockPos())) return;
+        
+        if(this.getStack().getCount() > 1)
         {
-            if( GreenCutsUtils.isSaplingStack(this.getStack()) )
-            {
-                if(this.itemAge >= GreenCuts.getConfig().getAutoPlantTicks())
-                {
-                    ServerWorld srvWorld = (ServerWorld) getWorld();
-                    BlockState state = Block.getBlockFromItem(this.getStack().getItem()).getDefaultState();
-                    if(state.getBlock().canPlaceAt(state, getWorld(), getBlockPos()) && getWorld().getBlockState(getBlockPos()).isAir())
-                    {
-                        if (GreenCutsUtils.tryPlanting(state.getBlock(), srvWorld, this.getBlockPos()))
-                        {
-                            if(this.getStack().getCount() > 1)
-                            {
-                                this.getStack().setCount(this.getStack().getCount() - 1);
-                            }
-                            else
-                            {
-                                this.discard();
-                            }
-                        }
-                        setTriedPlanting(true);
-                    }
-                }
-            }
+            this.getStack().setCount(this.getStack().getCount() - 1);
+            return;
         }
+        
+        this.discard();
+                 
     }
 
     @Inject( method = "writeCustomDataToNbt", at = @At("HEAD"))
