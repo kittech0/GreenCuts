@@ -2,7 +2,8 @@ package dev.venomcode.greencuts;
 
 import dev.venomcode.serverapi.api.ServerAPI;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.tinyremapper.extension.mixin.common.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -13,12 +14,11 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class GreenCuts implements ModInitializer {
     public static final String MODID = "greencuts";
-    private static Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
     @Override
     public void onInitialize( )
     {
-        logger = new Logger(Logger.Level.INFO);
         GreenCutsConfig tmp = getConfig();
         saveConfig();
     }
